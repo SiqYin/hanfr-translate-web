@@ -99,6 +99,14 @@
       "ipa_only_note": "词库未收录此词，以下为音标查询结果。",
       "ipa_missing_words": "以下词无音标：",
       "ipa_sentence_hint": "输入整句可查句音标与联诵",
+      "conj_form": "变位形式",
+      "conj_full": "「{w}」的完整变位表",
+      "conj_loading": "正在加载变位数据…",
+      "conj_inf": "不定式",
+      "conj_ppres": "现在分词",
+      "conj_ppasse": "过去分词",
+      "conj_nonfinite": "非人称形式",
+      "conj_lemma": "原型",
     },
 
     hant: {
@@ -193,6 +201,14 @@
       "ipa_only_note": "詞庫未收錄此詞，以下為音標查詢結果。",
       "ipa_missing_words": "以下詞無音標：",
       "ipa_sentence_hint": "輸入整句可查句音標與聯誦",
+      "conj_form": "變位形式",
+      "conj_full": "「{w}」的完整變位表",
+      "conj_loading": "正在載入變位資料…",
+      "conj_inf": "不定式",
+      "conj_ppres": "現在分詞",
+      "conj_ppasse": "過去分詞",
+      "conj_nonfinite": "非人稱形式",
+      "conj_lemma": "原型",
     },
 
     fr: {
@@ -287,6 +303,14 @@
       "ipa_only_note": "Mot absent du dictionnaire ; voici sa transcription phonétique.",
       "ipa_missing_words": "Sans transcription :",
       "ipa_sentence_hint": "Saisissez une phrase pour obtenir l'API et les liaisons",
+      "conj_form": "forme conjuguée",
+      "conj_full": "Tableau complet de « {w} »",
+      "conj_loading": "Chargement des conjugaisons…",
+      "conj_inf": "infinitif",
+      "conj_ppres": "participe présent",
+      "conj_ppasse": "participe passé",
+      "conj_nonfinite": "formes non personnelles",
+      "conj_lemma": "infinitif",
     },
 
     en: {
@@ -380,7 +404,15 @@
       pop_ipa_missing: "IPA missing, to verify",
       ipa_only_note: "Not in the dictionary; phonetic transcription shown below.",
       ipa_missing_words: "No transcription for:",
-      ipa_sentence_hint: "Enter a sentence to get IPA and liaisons"
+      ipa_sentence_hint: "Enter a sentence to get IPA and liaisons",
+      "conj_form": "conjugated form",
+      "conj_full": "Full conjugation of “{w}”",
+      "conj_loading": "Loading conjugation data…",
+      "conj_inf": "infinitive",
+      "conj_ppres": "present participle",
+      "conj_ppasse": "past participle",
+      "conj_nonfinite": "non-finite forms",
+      "conj_lemma": "infinitive",
     }
   };
 

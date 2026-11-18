@@ -152,6 +152,113 @@
   var input = document.getElementById("q");
   var clearBtn = document.getElementById("clear");
 
+  // ---------- 变位查询 ----------
+  // 输入变位形式（mangeais），给出原型与变位说明。
+  // 数据（conj.js / form_index.js 共 15 MB）按需加载，不进首屏。
+  var conjLoading = false;
+  var conjPendingQuery = null;
+
+  function conjCard(form, entries, lemmaTable) {
+    var CQ = window.ConjQuery;
+    var h = '<article class="hero conjhero">';
+
+    // 标题：查询的形式
+    h += '<div class="hero-head"><div class="hz fr-big">' + esc(form) + "</div>";
+    h += '<div class="hz-side"><span class="conj-tag">' +
+      esc(t("conj_form")) + "</span></div></div>";
+
+    // 原型 + 变位说明
+    h += '<div class="conj-list">';
+    entries.slice(0, 6).forEach(function (it) {
+      var lemma = it[0], tense = it[1], person = it[2];
+      var desc = CQ ? CQ.describe(tense, person) : (tense + " " + person);
+      var li = byFr.get(lemma) || byFold.get(foldFr(lemma)) || [];
+      var head = li.length ? ZF[li[0]] : null;
+      // 中文释义：取该法语词的对应中文词头；若与原型字面相同则不显示
+      var gloss = head ? (senses(head)[0] || "") : "";
+      if (gloss && gloss.toLowerCase() === lemma.toLowerCase()) gloss = "";
+
+      h += '<div class="conj-row" data-lemma="' + esc(lemma) + '">';
+      h += '<div class="conj-main">';
+      h += '<span class="conj-lemma">' + esc(lemma) + "</span>";
+      if (gloss) {
+        h += '<span class="conj-gloss">' + esc(gloss) + "</span>";
+      }
+      h += "</div>";
+      h += '<div class="conj-desc">' + esc(desc) + "</div>";
+      h += "</div>";
+    });
+    h += "</div>";
+
+    // 若有完整变位表，展开显示
+    if (lemmaTable) {
+      h += conjTable(lemmaTable, entries[0][0]);
+    }
+
+    h += "</article>";
+    return h;
+  }
+
+  // 完整变位表（折叠）
+  function conjTable(tab, lemma) {
+    var CQ = window.ConjQuery;
+    var order = ["présent", "imparfait", "passé simple", "futur",
+                 "conditionnel", "subjonctif", "impératif"];
+    var h = '<details class="conj-full"><summary>' +
+      esc(t("conj_full", { w: lemma })) + "</summary><div class=\"conj-grid\">";
+
+    order.forEach(function (tense) {
+      var forms = tab[tense];
+      if (!forms || !forms.length) return;
+      var persons = tense === "impératif"
+        ? ["2s", "1p", "2p"] : ["1s", "2s", "3s", "1p", "2p", "3p"];
+      h += '<div class="conj-block"><div class="conj-tense">' +
+        esc((CQ ? CQ.TENSE_ZH[tense] : tense) || tense) + "</div>";
+      forms.forEach(function (f, i) {
+        var p = persons[i] || "";
+        h += '<div class="conj-form"><span class="cf-p">' + esc(p) +
+          '</span><span class="cf-f tok frt" data-t="' + esc(f) + '">' +
+          esc(f) + "</span></div>";
+      });
+      h += "</div>";
+    });
+
+    // 非人称形式
+    var np = [];
+    if (tab["_infinitif"]) np.push([t("conj_inf"), tab["_infinitif"]]);
+    if (tab["_participe présent"]) np.push([t("conj_ppres"), tab["_participe présent"]]);
+    if (tab["_participe passé"]) np.push([t("conj_ppasse"), tab["_participe passé"]]);
+    if (np.length) {
+      h += '<div class="conj-block"><div class="conj-tense">' +
+        esc(t("conj_nonfinite")) + "</div>";
+      np.forEach(function (x) {
+        h += '<div class="conj-form"><span class="cf-p">' + esc(x[0]) +
+          '</span><span class="cf-f">' + esc(x[1]) + "</span></div>";
+      });
+      h += "</div>";
+    }
+
+    h += "</div></details>";
+    return h;
+  }
+
+  // 触发按需加载并重查
+  function ensureConjThen(q) {
+    if (conjLoading) return;
+    var CQ = window.ConjQuery;
+    if (!CQ) return;
+    conjLoading = true;
+    conjPendingQuery = q;
+    // 先在界面上给一个加载提示
+    resultsEl.innerHTML = '<div class="conj-loading">' + esc(t("conj_loading")) + "</div>";
+    CQ.ensure(function (ok) {
+      conjLoading = false;
+      var qq = conjPendingQuery;
+      conjPendingQuery = null;
+      if (qq) render(qq);
+    });
+  }
+
   function heroCard(i) {
     var e = ZF[i];
     var ss = senses(e), ips = ipas(e), ps = poss(e);
@@ -455,6 +562,35 @@
         if (!n) {
           var alone = wordIpaCard(q);
           if (alone) { html += alone; n = 1; }
+        }
+
+        // 变位形式查询：看它是不是某个动词的变位
+        //
+        // 注意触发条件：不能用「没查到结果」来判断是否加载变位数据。
+        // mangeais 这类变位形式在音标词典里是有的（能给出 /mɒ̃ʒɛ/），
+        // 所以 n=1，若按「n===0 才加载」就永远加载不到变位数据（实测踩过）。
+        // 改为：只要输入是单个法语词、且变位索引还没加载，就加载一次。
+        var CQ = window.ConjQuery;
+        if (CQ) {
+          if (CQ.hasIndex()) {
+            var ent = CQ.lookup(q);
+            if (ent && ent.length) {
+              var tab = CQ.table(ent[0][0]);
+              // 命中变位时，只显示变位卡片 + 该原型的词条。
+              // 不保留「包含 mangeais」这类子串误匹配——
+              // mangeais 含子串 mange，会连带拉出「痒」等完全无关的词。
+              var lemmaHits = frHero(ent[0][0]);
+              html = conjCard(q, ent, tab);
+              n = 1;
+              if (lemmaHits && lemmaHits.html) {
+                html += lemmaHits.html;
+                n = 2;
+              }
+            }
+          } else {
+            ensureConjThen(q);
+            return;
+          }
         }
       }
     }
