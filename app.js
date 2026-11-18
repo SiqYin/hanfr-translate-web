@@ -8,7 +8,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.0.0";
+  var APP_VERSION = "1.0.1";
 
   var ZF = window.ZF || [];
   var FR2ZH = window.FR2ZH || {};
@@ -195,28 +195,37 @@
   }
 
   // 例句：中文 / 法语 / 法语音标（联诵直接标在音标上）
+  //
+  // 单条例句存为 [zh, fr, ipa, liaisons, marked]；
+  // 多条例句存为 [[...], [...]] —— 两种形态都要能渲染。
   function exampleBlock(e) {
     var ex = e[6];
-    if (!ex || !ex[0]) return "";
-    var zh = ex[0];
-    // 兼容两种数据形态：
-    //   旧 [zh, fr, ipa, liaisons]        —— 联诵另标
-    //   新 [zh, fr, ipa, liaisons, marked] —— 第 5 位带 fr_marked / ipa_marked
-    var fr = ex[1] || "";
-    var ipa = ex[2] || "";
-    var lia = ex[3] || [];
-    var marked = ex[4] || null;
+    if (!ex || !ex.length) return "";
+    var list = Array.isArray(ex[0]) ? ex : [ex];
+    if (!list.length || !list[0][0]) return "";
 
-    var frShow = (marked && marked.fr) || fr;
-    var ipaShow = (marked && marked.ipa) || "";
+    var h = '<div class="det-ex"><div class="det-ex-h">' + esc(t("detail_example")) +
+      (list.length > 1 ? ' <span class="ex-n">' + list.length + "</span>" : "") + "</div>";
 
-    var h = '<div class="det-ex"><div class="det-ex-h">' + esc(t("detail_example")) + "</div>";
-    h += '<div class="ex-zh tokline zh">' + zhTokens(zh) + "</div>";
-    h += '<div class="ex-fr tokline fr">' + frTokens(frShow) + "</div>";
-    if (ipaShow || ipa) {
-      h += '<div class="ex-ipa" lang="fr">/' + renderIpaMarked(ipaShow || ipa) + "/</div>";
-    }
-    h += liaisonLegend(lia);
+    list.forEach(function (one) {
+      var zh = one[0];
+      var fr = one[1] || "";
+      var ipa = one[2] || "";
+      var lia = one[3] || [];
+      var marked = one[4] || null;
+      var frShow = (marked && marked.fr) || fr;
+      var ipaShow = (marked && marked.ipa) || "";
+
+      h += '<div class="ex-item">';
+      h += '<div class="ex-zh tokline zh">' + zhTokens(zh) + "</div>";
+      h += '<div class="ex-fr tokline fr">' + frTokens(frShow) + "</div>";
+      if (ipaShow || ipa) {
+        h += '<div class="ex-ipa" lang="fr">/' + renderIpaMarked(ipaShow || ipa) + "/</div>";
+      }
+      h += liaisonLegend(lia);
+      h += "</div>";
+    });
+
     h += "</div>";
     return h;
   }
@@ -666,7 +675,7 @@
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
     if (themeBtn) { themeBtn.setAttribute("data-mode", pref); themeBtn.title = t("theme_" + pref); }
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", dark ? "#131116" : "#faf8f5");
+    if (meta) meta.setAttribute("content", dark ? "#0d1520" : "#eef3f9");
     var list = document.getElementById("themelist");
     if (list) {
       Array.prototype.forEach.call(list.children, function (b) {
