@@ -8,7 +8,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.0.1";
+  var APP_VERSION = "1.0.2";
 
   var ZF = window.ZF || [];
   var FR2ZH = window.FR2ZH || {};
@@ -443,6 +443,87 @@
     return "";
   }
 
+  // ---------- 法语词详情 ----------
+  // 数据来自 app/frdetail.js（window.FRDETAIL）：
+  //   pos   ["n.f.","v."]        词性（通用标记）
+  //   g     ["f"]                阴阳性
+  //   gpending 1                 名词但缺性别 -> 显示「待核」
+  //   zh    ["家","房",...]      中文释义（已过滤文言/生僻）
+  //   syn / ant / deriv / also   近义 / 反义 / 派生 / 联想
+  //   ph    [" maison de ..."]   常见短语
+  function frDetailBlock(det) {
+    var h = '<div class="frd">';
+
+    // 词性 + 阴阳性
+    var tags = [];
+    (det.pos || []).forEach(function (p) {
+      tags.push('<span class="pos-tag">' + esc(p) + "</span>");
+    });
+    if (det.gpending && !(det.g || []).length) {
+      tags.push('<span class="pos-tag pending">' + esc(t("frd_gender_pending")) + "</span>");
+    }
+    if (tags.length) {
+      h += '<div class="frd-pos">' + tags.join("") + "</div>";
+    }
+
+    // 中文释义（逐条列出）
+    if (det.zh && det.zh.length) {
+      h += '<div class="frd-sec"><div class="frd-h">' + esc(t("frd_zh")) + "</div>";
+      h += '<div class="frd-zh">';
+      det.zh.forEach(function (z, i) {
+        var gi = bySimp.get(z);
+        h += '<span class="frd-zitem"' + (gi != null ? ' data-i="' + gi + '"' : "") + ">" +
+          '<span class="frd-n">' + (i + 1) + "</span>" + esc(z) + "</span>";
+      });
+      h += "</div></div>";
+    }
+
+    // 常见短语（含语域/领域标注，如 dial. / famil. / informatique）
+    if (det.ph && det.ph.length) {
+      h += '<div class="frd-sec"><div class="frd-h">' + esc(t("frd_phrases")) + "</div>";
+      h += '<div class="frd-ph">';
+      det.ph.forEach(function (p) {
+        // 兼容两种形态：["短语","标签"] 或旧的纯字符串
+        var phrase = Array.isArray(p) ? p[0] : p;
+        var label = Array.isArray(p) ? (p[1] || "") : "";
+        h += '<span class="frd-pitem">';
+        h += '<span class="tok frt" data-t="' + esc(phrase) + '">' + esc(phrase) + "</span>";
+        if (label) {
+          // 显式补一个空格，避免复制文本时短语与标签粘连（"verredial."）
+          h += ' <span class="frd-plabel">' + esc(label) + "</span>";
+        }
+        h += "</span>";
+      });
+      h += "</div></div>";
+    }
+
+    // 近义 / 反义
+    var relRows = [
+      ["syn", t("frd_syn"), "syn"],
+      ["ant", t("frd_ant"), "ant"],
+      ["deriv", t("frd_deriv"), "deriv"],
+      ["also", t("frd_also"), "also"],
+    ];
+    var anyRel = relRows.some(function (r) { return det[r[0]] && det[r[0]].length; });
+    if (anyRel) {
+      h += '<div class="frd-sec"><div class="frd-h">' + esc(t("frd_rel")) + "</div>";
+      relRows.forEach(function (r) {
+        var arr = det[r[0]];
+        if (!arr || !arr.length) return;
+        h += '<div class="frd-rel"><span class="frd-rlabel ' + r[2] + '">' +
+          esc(r[1]) + "</span>";
+        arr.forEach(function (w) {
+          h += '<span class="frd-ritem tok frt" data-t="' + esc(w) + '">' + esc(w) + "</span>";
+        });
+        h += "</div>";
+      });
+      h += "</div>";
+    }
+
+    h += "</div>";
+    return h;
+  }
+
   function frHero(q) {
     var r = searchFr(q);
     if (!r.exact.length && !r.starts.length && !r.contains.length &&
@@ -463,6 +544,10 @@
     h += '<div class="hz-side">' + ipaTag(ipa0, q) + "</div></div>";
 
     var gloss = r.gloss || [];
+    // 详情数据（词性/阴阳性/近义反义/派生/短语）
+    var det = window.FRDETAIL ? window.FRDETAIL[frKey(q)] : null;
+    if (det) h += frDetailBlock(det);
+
     if (gloss.length) {
       h += '<div class="answer"><span class="zh-big">' + esc(gloss[0]) + "</span>" +
         (bySimp.has(gloss[0]) ? '<span class="hz-meta"><span class="py">' +

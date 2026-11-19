@@ -107,6 +107,15 @@
       "conj_ppasse": "过去分词",
       "conj_nonfinite": "非人称形式",
       "conj_lemma": "原型",
+      "frd_zh": "中文释义",
+      "frd_phrases": "常见短语",
+      "frd_rel": "语义关联",
+      "frd_syn": "近义",
+      "frd_ant": "反义",
+      "frd_deriv": "派生",
+      "frd_also": "联想",
+      "frd_gender_pending": "性别待核",
+      "frd_loading": "正在加载词条详情…",
     },
 
     hant: {
@@ -209,6 +218,15 @@
       "conj_ppasse": "過去分詞",
       "conj_nonfinite": "非人稱形式",
       "conj_lemma": "原型",
+      "frd_zh": "中文釋義",
+      "frd_phrases": "常見短語",
+      "frd_rel": "語義關聯",
+      "frd_syn": "近義",
+      "frd_ant": "反義",
+      "frd_deriv": "派生",
+      "frd_also": "聯想",
+      "frd_gender_pending": "性別待核",
+      "frd_loading": "正在載入詞條詳情…",
     },
 
     fr: {
@@ -311,6 +329,15 @@
       "conj_ppasse": "participe passé",
       "conj_nonfinite": "formes non personnelles",
       "conj_lemma": "infinitif",
+      "frd_zh": "Sens en chinois",
+      "frd_phrases": "Expressions courantes",
+      "frd_rel": "Réseau sémantique",
+      "frd_syn": "synonymes",
+      "frd_ant": "antonymes",
+      "frd_deriv": "dérivés",
+      "frd_also": "associés",
+      "frd_gender_pending": "genre à vérifier",
+      "frd_loading": "Chargement de la fiche…",
     },
 
     en: {
@@ -413,6 +440,15 @@
       "conj_ppasse": "past participle",
       "conj_nonfinite": "non-finite forms",
       "conj_lemma": "infinitive",
+      "frd_zh": "Chinese senses",
+      "frd_phrases": "Common phrases",
+      "frd_rel": "Semantic network",
+      "frd_syn": "synonyms",
+      "frd_ant": "antonyms",
+      "frd_deriv": "derivatives",
+      "frd_also": "related",
+      "frd_gender_pending": "gender to verify",
+      "frd_loading": "Loading entry…",
     }
   };
 

@@ -80,6 +80,7 @@
 
   --zh-font: "LXGW WenKai", "PingFang SC", "Microsoft YaHei", serif;
   --fr-font: "Gentium Plus", "Noto Serif", Georgia, "Times New Roman", serif;
+  --ui-font: "LXGW WenKai", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   --ipa-font: "Gentium Plus", "Doulos SIL", "Charis SIL", "Noto Sans", "DejaVu Sans", serif;
 }
 
@@ -520,6 +521,135 @@ main { padding: 14px; max-width: 760px; margin: 0 auto; }
   border-radius: 6px;
   padding: 6px 10px;
 }
+
+/* ===== 法语词详情 ===== */
+.frd { margin: 10px 0 4px; }
+
+.frd-pos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.pos-tag {
+  font-size: 11.5px;
+  color: var(--fr);
+  background: var(--fr-soft);
+  border: 1px solid var(--fr-line);
+  border-radius: 5px;
+  padding: 1px 8px;
+  font-family: var(--fr-font);
+  font-style: italic;
+}
+.pos-tag.pending {
+  color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 10%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--warn) 45%, transparent);
+  font-style: normal;
+  font-size: 10.5px;
+}
+
+.frd-sec { margin-top: 11px; }
+
+.frd-h {
+  font-size: 10.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  margin-bottom: 6px;
+}
+
+/* 中文释义：逐条带序号 */
+.frd-zh {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.frd-zitem {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 14.5px;
+  color: var(--zh-900);
+  background: var(--zh-soft);
+  border: 1px solid var(--zh-line);
+  border-radius: var(--radius-pill);
+  padding: 3px 11px;
+  cursor: pointer;
+}
+
+.frd-zitem:hover { background: color-mix(in srgb, var(--zh) 14%, var(--bg-2)); }
+
+.frd-n {
+  font-size: 9.5px;
+  color: var(--zh-500);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 短语 */
+.frd-ph { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.frd-pitem {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 12.5px;
+  color: var(--fr);
+  background: var(--bg-3);
+  border-radius: 5px;
+  padding: 3px 9px;
+  font-family: var(--fr-font);
+  cursor: pointer;
+}
+.frd-pitem:hover { background: var(--fr-soft); }
+
+/* 语域/领域标注（dial. / famil. / informatique…） */
+.frd-plabel {
+  font-size: 9.5px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 10%, transparent);
+  border-radius: 4px;
+  padding: 0 5px;
+  margin-left: 2px;
+  font-family: var(--ui-font);
+  letter-spacing: .02em;
+  font-style: italic;
+}
+
+/* 语义关联 */
+.frd-rel {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px 7px;
+  margin-bottom: 8px;
+  /* 语义关联行可能较长，允许换行且不被父容器裁掉 */
+  min-height: 22px;
+  overflow: visible;
+}
+
+.frd-rlabel {
+  flex: none;
+  font-size: 10.5px;
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-weight: 600;
+}
+.frd-rlabel.syn { color: var(--ok); background: color-mix(in srgb, var(--ok) 13%, transparent); }
+.frd-rlabel.ant { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+.frd-rlabel.deriv { color: var(--fr); background: var(--fr-soft); }
+.frd-rlabel.also { color: var(--muted); background: var(--bg-3); }
+
+.frd-ritem {
+  font-size: 12.5px;
+  color: var(--fr-900);
+  font-family: var(--fr-font);
+  border-bottom: 1px dashed var(--fr-line);
+  cursor: pointer;
+}
+.frd-ritem:hover { border-bottom-color: var(--fr-2); }
 
 /* ===== 变位查询 ===== */
 .conj-tag {
