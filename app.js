@@ -443,6 +443,23 @@
     return "";
   }
 
+  // 法语词的例句块：[zh, fr, ipa]
+  function frExampleBlock(list) {
+    var h = '<div class="frd-sec"><div class="frd-h">' + esc(t("frd_examples")) + "</div>";
+    h += '<div class="frd-exs">';
+    list.forEach(function (x) {
+      h += '<div class="frd-ex">';
+      h += '<div class="frd-ex-zh">' + esc(x[0]) + "</div>";
+      h += '<div class="frd-ex-fr tok frt">' + esc(x[1]) + "</div>";
+      if (x[2]) {
+        h += '<div class="frd-ex-ipa" lang="fr">/' + esc(x[2]) + "/</div>";
+      }
+      h += "</div>";
+    });
+    h += "</div></div>";
+    return h;
+  }
+
   // ---------- 法语词详情 ----------
   // 数据来自 app/frdetail.js（window.FRDETAIL）：
   //   pos   ["n.f.","v."]        词性（通用标记）
@@ -451,7 +468,7 @@
   //   zh    ["家","房",...]      中文释义（已过滤文言/生僻）
   //   syn / ant / deriv / also   近义 / 反义 / 派生 / 联想
   //   ph    [" maison de ..."]   常见短语
-  function frDetailBlock(det) {
+  function frDetailBlock(det, word) {
     var h = '<div class="frd">';
 
     // 词性 + 阴阳性
@@ -461,6 +478,11 @@
     });
     if (det.gpending && !(det.g || []).length) {
       tags.push('<span class="pos-tag pending">' + esc(t("frd_gender_pending")) + "</span>");
+    }
+    // 词根（只在词形变化过时才有）
+    if (det.root) {
+      tags.push('<span class="pos-tag root">' + esc(t("frd_root")) + " " +
+        esc(det.root) + "</span>");
     }
     if (tags.length) {
       h += '<div class="frd-pos">' + tags.join("") + "</div>";
@@ -477,6 +499,23 @@
       });
       h += "</div></div>";
     }
+
+    // 词根 + 例句索引
+    //   root  仅在词形真的变化过时存在
+    //   例句来自 frex.js（按需加载），没加载时显示占位并在加载后重绘
+    var exBlock = "";
+    var FX = window.FrExamples;
+    if (FX) {
+      var exs = FX.of(word);
+      if (exs && exs.length) {
+        exBlock = frExampleBlock(exs);
+      } else if (!FX.ready()) {
+        exBlock = '<div class="frd-sec"><div class="frd-h">' +
+          esc(t("frd_examples")) + '</div><div class="frd-exload">' +
+          esc(t("frd_loading")) + "</div></div>";
+      }
+    }
+    h += exBlock;
 
     // 常见短语（含语域/领域标注，如 dial. / famil. / informatique）
     if (det.ph && det.ph.length) {
@@ -497,11 +536,12 @@
       h += "</div></div>";
     }
 
-    // 近义 / 反义
+    // 近义 / 反义 / 派生 / 联想
     var relRows = [
       ["syn", t("frd_syn"), "syn"],
       ["ant", t("frd_ant"), "ant"],
       ["deriv", t("frd_deriv"), "deriv"],
+      ["assoc", t("frd_assoc"), "also"],
       ["also", t("frd_also"), "also"],
     ];
     var anyRel = relRows.some(function (r) { return det[r[0]] && det[r[0]].length; });
@@ -546,7 +586,14 @@
     var gloss = r.gloss || [];
     // 详情数据（词性/阴阳性/近义反义/派生/短语）
     var det = window.FRDETAIL ? window.FRDETAIL[frKey(q)] : null;
-    if (det) h += frDetailBlock(det);
+    if (det) h += frDetailBlock(det, frKey(q));
+
+    // 例句索引未加载时，后台加载并在完成后重绘一次
+    if (window.FrExamples && !window.FrExamples.ready()) {
+      window.FrExamples.ensure(function (ok) {
+        if (ok) render(input.value);
+      });
+    }
 
     if (gloss.length) {
       h += '<div class="answer"><span class="zh-big">' + esc(gloss[0]) + "</span>" +

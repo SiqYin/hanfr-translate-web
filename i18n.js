@@ -116,6 +116,9 @@
       "frd_also": "联想",
       "frd_gender_pending": "性别待核",
       "frd_loading": "正在加载词条详情…",
+      "frd_root": "词根",
+      "frd_assoc": "联想",
+      "frd_examples": "例句",
     },
 
     hant: {
@@ -227,6 +230,9 @@
       "frd_also": "聯想",
       "frd_gender_pending": "性別待核",
       "frd_loading": "正在載入詞條詳情…",
+      "frd_root": "詞根",
+      "frd_assoc": "聯想",
+      "frd_examples": "例句",
     },
 
     fr: {
@@ -338,6 +344,9 @@
       "frd_also": "associés",
       "frd_gender_pending": "genre à vérifier",
       "frd_loading": "Chargement de la fiche…",
+      "frd_root": "racine",
+      "frd_assoc": "associés",
+      "frd_examples": "Exemples",
     },
 
     en: {
@@ -449,6 +458,9 @@
       "frd_also": "related",
       "frd_gender_pending": "gender to verify",
       "frd_loading": "Loading entry…",
+      "frd_root": "root",
+      "frd_assoc": "related",
+      "frd_examples": "Examples",
     }
   };
 

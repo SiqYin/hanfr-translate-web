@@ -651,6 +651,39 @@ main { padding: 14px; max-width: 760px; margin: 0 auto; }
 }
 .frd-ritem:hover { border-bottom-color: var(--fr-2); }
 
+.pos-tag.root {
+  color: var(--muted);
+  background: var(--bg-3);
+  border-color: var(--line);
+  font-style: normal;
+  font-size: 10.5px;
+}
+
+/* 法语词例句 */
+.frd-exs { display: flex; flex-direction: column; gap: 9px; }
+
+.frd-ex {
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  background: var(--fr-soft);
+  border: 1px solid var(--fr-line);
+}
+
+.frd-ex-zh { font-size: 13.5px; color: var(--zh-900); margin-bottom: 3px; }
+.frd-ex-fr { font-size: 13.5px; color: var(--fr-900); font-family: var(--fr-font); }
+.frd-ex-ipa {
+  font-size: 12px;
+  color: var(--fr);
+  font-family: var(--fr-font);
+  margin-top: 2px;
+}
+
+.frd-exload {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 8px 0;
+}
+
 /* ===== 变位查询 ===== */
 .conj-tag {
   font-size: 10.5px;

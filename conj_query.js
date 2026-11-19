@@ -121,4 +121,41 @@
     TENSE_ZH: TENSE_ZH,
     PERSON_ZH: PERSON_ZH
   };
+
+  /* ---------- 法语例句索引（frex.js，8.2 MB）也按需加载 ---------- */
+  var exLoaded = false, exLoading = null, exWaiters = [];
+
+  function ensureExamples(cb) {
+    if (exLoaded || window.FREX) { exLoaded = true; return cb(true); }
+    if (exLoading) { exWaiters.push(cb); return; }
+    exLoading = true;
+    exWaiters = [cb];
+    var s = document.createElement("script");
+    s.src = "frex.js";
+    s.async = true;
+    s.onload = function () {
+      exLoaded = true; exLoading = null;
+      var q = exWaiters; exWaiters = [];
+      q.forEach(function (f) { try { f(true); } catch (e) {} });
+    };
+    s.onerror = function () {
+      exLoading = null;
+      var q = exWaiters; exWaiters = [];
+      q.forEach(function (f) { try { f(false); } catch (e) {} });
+    };
+    document.head.appendChild(s);
+  }
+
+  /** 取某法语词的例句：[[zh, fr, ipa], ...] */
+  function examplesOf(word) {
+    if (!window.FREX) return null;
+    var k = String(word || "").toLowerCase().trim();
+    return window.FREX[k] || null;
+  }
+
+  window.FrExamples = {
+    ensure: ensureExamples,
+    of: examplesOf,
+    ready: function () { return !!window.FREX; }
+  };
 })();
