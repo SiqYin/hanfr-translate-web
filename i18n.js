@@ -119,6 +119,8 @@
       "frd_root": "词根",
       "frd_assoc": "联想",
       "frd_examples": "例句",
+      "lar_from_dict": "拉鲁斯双解",
+      "frd_from_lemma": "此形式为「{w}」的变形，释义引自该词",
     },
 
     hant: {
@@ -233,6 +235,8 @@
       "frd_root": "詞根",
       "frd_assoc": "聯想",
       "frd_examples": "例句",
+      "lar_from_dict": "拉魯斯雙解",
+      "frd_from_lemma": "此形式為「{w}」的變形，釋義引自該詞",
     },
 
     fr: {
@@ -347,6 +351,8 @@
       "frd_root": "racine",
       "frd_assoc": "associés",
       "frd_examples": "Exemples",
+      "lar_from_dict": "Larousse bilingue",
+      "frd_from_lemma": "Forme de « {w} » ; sens repris de ce mot",
     },
 
     en: {
@@ -461,6 +467,8 @@
       "frd_root": "root",
       "frd_assoc": "related",
       "frd_examples": "Examples",
+      "lar_from_dict": "Larousse bilingual",
+      "frd_from_lemma": "Form of \"{w}\"; senses taken from that word",
     }
   };
 

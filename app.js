@@ -8,7 +8,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.0.2";
+  var APP_VERSION = "1.0.3";
 
   var ZF = window.ZF || [];
   var FR2ZH = window.FR2ZH || {};
@@ -152,7 +152,36 @@
   var input = document.getElementById("q");
   var clearBtn = document.getElementById("clear");
 
-  // ---------- 变位查询 ----------
+  // ---------- 中 → 法：拉鲁斯反查 ----------
+  // 旧做法的问题：CFDICT 是单词对译词典，收了很多文言单字
+  //   麗 丽 [li4] /beau/   ->  查「丽」只给 beau
+  //   佼 佼 [jiao3] /beau/ ->  查「佼」只给 beau
+  // 现在改为从拉鲁斯双解反查：每个义项有中文对应词 + 法语词 + 义项 + 词性。
+  function zhLarCard(q) {
+    var L = window.ZHLAR;
+    if (!L) return "";
+    var arr = L[q];
+    if (!arr || !arr.length) return "";
+
+    var h = '<article class="hero larcard">';
+    h += '<div class="hero-head"><div class="hz">' + esc(q) + "</div>";
+    h += '<div class="hz-side"><span class="conj-tag">' +
+      esc(t("lar_from_dict")) + "</span></div></div>";
+
+    h += '<div class="lar-list">';
+    arr.forEach(function (it) {
+      var fr = it[0], pos = it[1] || "", def = it[2] || "";
+      h += '<div class="lar-row">';
+      h += '<div class="lar-main">';
+      h += '<span class="lar-fr tok frt" data-t="' + esc(fr) + '">' + esc(fr) + "</span>";
+      if (pos) h += '<span class="pos-tag">' + esc(pos) + "</span>";
+      h += "</div>";
+      if (def) h += '<div class="lar-def">' + esc(def) + "</div>";
+      h += "</div>";
+    });
+    h += "</div></article>";
+    return h;
+  }
   // 输入变位形式（mangeais），给出原型与变位说明。
   // 数据（conj.js / form_index.js 共 15 MB）按需加载，不进首屏。
   var conjLoading = false;
@@ -488,14 +517,45 @@
       h += '<div class="frd-pos">' + tags.join("") + "</div>";
     }
 
-    // 中文释义（逐条列出）
-    if (det.zh && det.zh.length) {
+    // 义项：法语释义 + 中文对应词 + 词性 + 领域标记
+    // 数据来自拉鲁斯双解，每个义项是
+    //   { fr: "Bâtiment construit pour...", zh: "公寓楼", pos: "n. f.", dom: [...] }
+    if (det.s && det.s.length) {
+      if (det.lemma) {
+        h += '<div class="frd-sec"><div class="frd-lemma">' +
+          esc(t("frd_from_lemma", { w: det.lemma })) + "</div></div>";
+      }
       h += '<div class="frd-sec"><div class="frd-h">' + esc(t("frd_zh")) + "</div>";
-      h += '<div class="frd-zh">';
-      det.zh.forEach(function (z, i) {
-        var gi = bySimp.get(z);
-        h += '<span class="frd-zitem"' + (gi != null ? ' data-i="' + gi + '"' : "") + ">" +
-          '<span class="frd-n">' + (i + 1) + "</span>" + esc(z) + "</span>";
+      h += '<div class="frd-senses">';
+      det.s.forEach(function (s, i) {
+        h += '<div class="frd-sense">';
+        h += '<span class="frd-sn">' + (i + 1) + "</span>";
+        h += '<div class="frd-sbody">';
+        // 中文对应词放前面（用户是中文母语者，先看中文）
+        if (s.zh) {
+          h += '<div class="frd-szh">';
+          s.zh.split(/[,;，；、]/).forEach(function (z) {
+            z = z.trim();
+            if (!z) return;
+            var gi = bySimp.get(z);
+            h += '<span class="frd-zitem"' + (gi != null ? ' data-i="' + gi + '"' : "") +
+              ">" + esc(z) + "</span>";
+          });
+          h += "</div>";
+        }
+        if (s.fr) {
+          h += '<div class="frd-sfr">' + esc(s.fr) + "</div>";
+        }
+        if (s.ex) {
+          h += '<div class="frd-sex">' + esc(s.ex) + "</div>";
+        }
+        var meta = [];
+        if (s.pos) meta.push(s.pos);
+        if (s.dom && s.dom.length) meta.push("〔" + s.dom.join("〕〔") + "〕");
+        if (meta.length) {
+          h += '<div class="frd-smeta">' + esc(meta.join(" ")) + "</div>";
+        }
+        h += "</div></div>";
       });
       h += "</div></div>";
     }
@@ -676,6 +736,10 @@
     var html = "", n = 0;
 
     if (isCJK) {
+      // 拉鲁斯反查优先：给出「法语词 + 词性 + 法语释义」的完整对应
+      var larHtml = zhLarCard(q);
+      if (larHtml) { html += larHtml; n++; }
+
       var r = searchZh(q);
       if (r.exact.length) { html += heroCard(r.exact[0]); n++; }
       r.rest.forEach(function (i) { html += compactCard(i); n++; });
