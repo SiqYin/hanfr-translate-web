@@ -755,9 +755,24 @@
         var h = frHero(q);
         if (h && h.html) { html += h.html; n = h.count || 1; }
         // 词库没有，但音标词典有 -> 也给结果（很多词 CFDICT 未收）
+        //
+        // 注意：这类词（如 abaca / hypothyroïdisme）在中文词库里查不到，
+        // frHero 返回 null，但 frdetail 里**有**完整的词性与中文释义。
+        // 早期版本在这种情况下不渲染详情，导致明明有释义却显示不出来。
         if (!n) {
           var alone = wordIpaCard(q);
           if (alone) { html += alone; n = 1; }
+          var det0 = window.FRDETAIL ? window.FRDETAIL[frKey(q)] : null;
+          if (det0) {
+            var dblk = frDetailBlock(det0, frKey(q));
+            if (dblk) {
+              html += '<article class="hero frhero">' +
+                '<div class="hero-head"><div class="hz fr-big">' + esc(q.trim()) +
+                '</div><div class="hz-side">' + ipaTag(det0.ipa || "", q) +
+                "</div></div>" + dblk + "</article>";
+              n = Math.max(1, n);
+            }
+          }
         }
 
         // 变位形式查询：看它是不是某个动词的变位
